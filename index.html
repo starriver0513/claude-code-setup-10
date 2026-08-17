@@ -1,0 +1,1003 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>プロだけがやっているClaude Codeの初期設定10選｜保存版資料</title>
+<meta name="description" content="Claude Codeの初期設定10選を、手順とコピペ用プロンプトつきでまとめた保存版資料です。フォルダ構造の一撃構築プロンプトと、実際に使っているAPIリストも収録しています。">
+<meta property="og:title" content="プロだけがやっているClaude Codeの初期設定10選｜保存版資料">
+<meta property="og:description" content="Claude Codeの初期設定10選を、手順とコピペ用プロンプトつきでまとめた保存版資料です。">
+<meta property="og:image" content="assets/ogp.png">
+<meta name="theme-color" content="#0b2a5b">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=M+PLUS+1:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   保存版資料テンプレート v2 — 青ベース / 動きあり / GitHub Pages配布用
+   使い方: 各コンポーネントは <!-- [C:名前] --> で始まる。
+           使わないブロックはコメントごと削除してよい。
+   ============================================================ */
+
+:root{
+  /* --- 色（青ベース。紫・ピンクは使わない） --- */
+  --ink:#0a1020;          /* 本文 */
+  --ink-soft:#22304a;     /* 見出し補助 */
+  --muted:#5c6880;        /* 補足文 */
+  --navy:#0b2a5b;         /* 濃紺 */
+  --blue:#0866ff;         /* 主役の青 */
+  --blue-dark:#073b9a;
+  --cyan:#28d3ff;         /* 差し色 */
+  --sky:#d9eaff;
+  --blue-soft:#eef5ff;
+  --line:#d8e4f6;
+  --bg:#f6f9ff;
+  --white:#fff;
+  --code-bg:#0b1834;      /* プロンプト枠 */
+  --ok:#0f9d58;
+  --warn:#f59e0b;
+  --grad-hero:linear-gradient(135deg,#040c22 0%,#062a68 48%,#0a63d6 100%);
+  --grad-accent:linear-gradient(135deg,var(--cyan) 0%,var(--blue) 100%);
+  --shadow:0 18px 44px rgba(8,32,80,.12);
+  --shadow-hover:0 26px 64px rgba(8,32,80,.22);
+  --radius:18px;
+  --radius-sm:12px;
+  --max:1040px;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:hidden;scroll-padding-top:24px}
+body{
+  margin:0;color:var(--ink);background:var(--bg);
+  font-family:'Noto Sans JP',-apple-system,BlinkMacSystemFont,'Hiragino Sans',Meiryo,sans-serif;
+  line-height:1.95;font-size:16px;overflow-x:hidden;
+  background-image:
+    radial-gradient(circle at 12% -4%,rgba(8,102,255,.10),transparent 34%),
+    radial-gradient(circle at 92% 6%,rgba(40,211,255,.10),transparent 30%);
+  background-attachment:fixed;
+}
+a{color:var(--blue);font-weight:700;text-underline-offset:3px;text-decoration-thickness:2px}
+img{max-width:100%;height:auto;display:block}
+
+/* [C:進捗バー] ページ上端のスクロール進捗 */
+.progress{position:fixed;inset:0 0 auto 0;height:4px;z-index:60;background:transparent}
+.progress span{display:block;height:100%;width:0;background:var(--grad-accent);box-shadow:0 0 14px rgba(8,102,255,.6);transition:width .1s linear}
+
+.page{width:min(var(--max),calc(100vw - 32px));margin:0 auto;padding:28px 0 96px}
+
+/* ============ [C:ヒーロー] ============ */
+.hero{position:relative;overflow:hidden;border-radius:26px;color:#fff;padding:clamp(30px,5vw,64px);background:var(--grad-hero);box-shadow:var(--shadow-hover)}
+.hero::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(135deg,rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(45deg,rgba(255,255,255,.05) 1px,transparent 1px);
+  background-size:74px 74px;opacity:.6}
+.hero::after{content:"";position:absolute;width:280px;height:280px;right:-90px;top:-110px;border-radius:50%;
+  background:radial-gradient(circle,rgba(40,211,255,.35),transparent 70%);animation:float 7s ease-in-out infinite;pointer-events:none}
+.hero-inner{position:relative;z-index:1}
+.hero-glow{position:absolute;inset:-40%;z-index:0;pointer-events:none;opacity:.5;
+  background:radial-gradient(320px circle at var(--mx,50%) var(--my,50%),rgba(120,190,255,.30),transparent 60%);transition:opacity .4s ease}
+@keyframes float{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(0,-14px,0)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+
+.badge{display:inline-flex;align-items:center;gap:8px;padding:7px 16px;border-radius:999px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+  font-size:12px;font-weight:800;letter-spacing:.1em}
+.badge .dot{width:8px;height:8px;border-radius:50%;background:#4ade80;animation:blink 1.8s ease-in-out infinite}
+.hero h1{margin:18px 0 14px;font-family:'M PLUS 1',sans-serif;font-size:clamp(27px,5.4vw,52px);line-height:1.28;font-weight:800;letter-spacing:-.01em}
+.hero h1 .grad{background:linear-gradient(135deg,#8fd6ff,#fff 60%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hero .lead{margin:0;font-size:clamp(14px,2.2vw,17px);opacity:.94;max-width:44em}
+.hero-meta{margin-top:16px;font-size:13px;opacity:.8}
+.hero-cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
+.hero-figure{margin-top:28px;border-radius:18px;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.16),0 16px 40px rgba(0,0,0,.42)}
+.hero-stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+.hero-stat{flex:1 1 150px;padding:14px 16px;border-radius:14px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16)}
+.hero-stat b{display:block;font-family:'M PLUS 1',sans-serif;font-size:clamp(20px,3.4vw,28px);line-height:1.3}
+.hero-stat span{font-size:12px;opacity:.82}
+
+/* ============ [C:ボタン] ============ */
+.btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:13px 24px;
+  overflow:hidden;border-radius:14px;background:var(--grad-accent);color:#fff!important;font-weight:900;text-decoration:none;
+  box-shadow:0 12px 30px rgba(8,102,255,.34);transition:transform .26s ease,box-shadow .26s ease}
+.btn::before{content:"";position:absolute;inset:0;transform:translateX(-130%);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.38),transparent);transition:transform .6s ease}
+.btn:hover{transform:translateY(-3px);box-shadow:0 18px 42px rgba(8,102,255,.46)}
+.btn:hover::before{transform:translateX(130%)}
+.btn.ghost{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.4);box-shadow:none}
+.btn.solid{background:var(--navy);box-shadow:0 12px 30px rgba(11,42,91,.28)}
+.btn.small{min-height:40px;padding:9px 16px;font-size:13px;border-radius:11px;box-shadow:var(--shadow)}
+/* [C:ツールリンク] 本文中に置く小さめリンクボタン。章末に集約せず、話題が出た章の中に置く */
+.toollink{display:inline-flex;align-items:center;gap:7px;margin:4px 8px 4px 0;padding:8px 14px;border-radius:999px;
+  background:var(--white);border:1px solid var(--line);color:var(--blue)!important;font-size:13.5px;font-weight:800;
+  text-decoration:none;box-shadow:0 6px 16px rgba(8,32,80,.07);transition:transform .2s ease,border-color .2s ease}
+.toollink:hover{transform:translateY(-2px);border-color:var(--blue)}
+.toollink::after{content:"↗";font-size:11px;opacity:.7}
+
+/* ============ [C:目次] ============ */
+.toc{margin:30px 0 0;padding:24px 26px;border-radius:var(--radius);background:var(--white);border:1px solid var(--line);box-shadow:var(--shadow)}
+.toc h2{margin:0 0 14px;font-family:'M PLUS 1',sans-serif;font-size:17px;color:var(--navy)}
+.toc ol{margin:0;padding-left:0;list-style:none;counter-reset:toc;display:grid;gap:6px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.toc li{counter-increment:toc}
+.toc a{display:flex;gap:10px;align-items:baseline;padding:8px 10px;border-radius:10px;color:var(--ink-soft)!important;
+  font-weight:700;font-size:14.5px;text-decoration:none;transition:background .2s ease,color .2s ease}
+.toc a::before{content:counter(toc,decimal-leading-zero);color:var(--blue);font-family:'M PLUS 1',sans-serif;font-size:13px}
+.toc a:hover,.toc a.active{background:var(--blue-soft);color:var(--navy)!important}
+
+/* [C:サイド進捗ナビ] PCのみ。現在地を点で示す */
+.sidenav{position:fixed;right:22px;top:50%;transform:translateY(-50%);z-index:40;display:none;flex-direction:column;gap:11px}
+.sidenav a{position:relative;width:11px;height:11px;border-radius:50%;background:var(--line);transition:background .25s ease,transform .25s ease}
+.sidenav a.active{background:var(--blue);transform:scale(1.45)}
+.sidenav a span{position:absolute;right:20px;top:50%;transform:translateY(-50%) translateX(6px);white-space:nowrap;
+  padding:5px 10px;border-radius:8px;background:var(--navy);color:#fff;font-size:11.5px;font-weight:700;
+  opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease}
+.sidenav a:hover span{opacity:1;transform:translateY(-50%) translateX(0)}
+@media (min-width:1240px){.sidenav{display:flex}}
+
+/* ============ [C:セクション見出し] ============ */
+.sec{margin-top:56px}
+.sec-label{margin:0;text-align:center;font-family:'M PLUS 1',sans-serif;font-size:12.5px;letter-spacing:.16em;color:var(--blue);font-weight:800}
+.sec-title{margin:6px 0 6px;text-align:center;font-family:'M PLUS 1',sans-serif;font-size:clamp(21px,4.4vw,31px);line-height:1.42;color:var(--navy);font-weight:800}
+.sec-lead{margin:0 auto;max-width:36em;text-align:center;font-size:14.5px;color:var(--muted)}
+
+/* ============ [C:本文カード] ============ */
+.card{margin-top:22px;padding:clamp(20px,3.4vw,32px);border-radius:var(--radius);background:var(--white);
+  border:1px solid var(--line);box-shadow:var(--shadow);transition:transform .3s ease,box-shadow .3s ease}
+.card:hover{box-shadow:var(--shadow-hover)}
+.card h3{margin:26px 0 10px;font-family:'M PLUS 1',sans-serif;font-size:clamp(17px,2.8vw,21px);color:var(--navy);line-height:1.5}
+.card h3:first-child{margin-top:0}
+.card p{margin:0 0 12px}
+.card p:last-child{margin-bottom:0}
+.hl{background:linear-gradient(transparent 62%,rgba(8,102,255,.22) 62%);font-weight:800}
+
+/* [C:3Dホバーカード] グリッド内の小カードだけ軽く反応させる */
+.tilt{transform-style:preserve-3d;transition:transform .3s ease}
+
+/* ============ [C:手順ステップ] 番号つき縦並び ============ */
+.step{display:flex;gap:16px;padding:20px 0;border-top:1px dashed var(--line)}
+.step:first-of-type{border-top:0;padding-top:4px}
+.step-no{flex:0 0 42px;height:42px;display:flex;align-items:center;justify-content:center;border-radius:12px;
+  background:var(--grad-accent);color:#fff;font-family:'M PLUS 1',sans-serif;font-weight:800;font-size:17px;
+  box-shadow:0 8px 20px rgba(8,102,255,.28)}
+.step-body{flex:1;min-width:0}
+.step-body h4{margin:6px 0 8px;font-family:'M PLUS 1',sans-serif;font-size:16.5px;color:var(--navy);line-height:1.55}
+.step-body p{margin:0 0 10px;font-size:15px}
+
+/* ============ [C:グリッドカード] 3つ並べる用 ============ */
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin-top:6px}
+.grid-item{padding:20px;border-radius:var(--radius-sm);background:var(--blue-soft);border:1px solid var(--line)}
+.grid-item .tag{display:inline-block;margin-bottom:8px;padding:3px 11px;border-radius:999px;background:var(--navy);color:#fff;font-size:11.5px;font-weight:800}
+.grid-item h4{margin:0 0 7px;font-family:'M PLUS 1',sans-serif;font-size:16px;color:var(--navy);line-height:1.5}
+.grid-item p{margin:0;font-size:14px;color:var(--ink-soft)}
+
+/* ============ [C:要点リスト] ============ */
+.takeaway{margin:0;padding:0;list-style:none;counter-reset:tk}
+.takeaway li{counter-increment:tk;position:relative;padding:14px 0 14px 46px;border-bottom:1px dashed var(--line)}
+.takeaway li:last-child{border-bottom:0}
+.takeaway li::before{content:counter(tk);position:absolute;left:0;top:14px;width:30px;height:30px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;background:var(--navy);color:#fff;font-size:14px;font-weight:800}
+.takeaway b{display:block;color:var(--navy);font-size:16px;line-height:1.6}
+.takeaway span{display:block;margin-top:5px;font-size:14.5px;color:var(--ink-soft)}
+
+/* [C:チェックリスト] */
+.check{margin:0;padding:0;list-style:none}
+.check li{position:relative;padding:9px 0 9px 32px;font-size:15px}
+.check li::before{content:"";position:absolute;left:4px;top:17px;width:14px;height:8px;border-left:3px solid var(--blue);border-bottom:3px solid var(--blue);transform:rotate(-45deg)}
+
+/* ============ [C:プロンプト枠] コピーボタン付き ============ */
+.prompt{position:relative;margin:18px 0;border-radius:var(--radius-sm);background:var(--code-bg);
+  box-shadow:0 16px 38px rgba(4,20,54,.32);overflow:hidden}
+.prompt-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 16px;
+  background:rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.09)}
+.prompt-head b{color:#cfe4ff;font-size:12.5px;font-weight:800;letter-spacing:.04em}
+.copy{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border:0;border-radius:9px;cursor:pointer;
+  background:var(--blue);color:#fff;font-size:12px;font-weight:800;font-family:inherit;transition:background .2s ease,transform .2s ease}
+.copy:hover{transform:translateY(-1px)}
+.copy.done{background:var(--ok)}
+.prompt pre{margin:0;padding:18px 18px 20px;overflow-x:auto;color:#e6f0ff;font-size:13.5px;line-height:1.85;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,'Noto Sans JP',monospace;white-space:pre-wrap;word-break:break-word}
+
+/* ============ [C:画像] 生成画像・スクショを本文に挟む ============ */
+.figure{margin:22px 0;border-radius:var(--radius-sm);overflow:hidden;background:var(--white);border:1px solid var(--line);box-shadow:var(--shadow)}
+.figure img{width:100%}
+.figure figcaption{padding:12px 16px;font-size:13px;color:var(--muted);background:var(--blue-soft);border-top:1px solid var(--line)}
+
+/* ============ [C:動画] 16:9で埋め込む ============ */
+.video{margin:20px 0 0;border-radius:var(--radius-sm);overflow:hidden;background:#050d1f;aspect-ratio:16/9;box-shadow:var(--shadow)}
+.video iframe,.video video{width:100%;height:100%;border:0;display:block}
+.video-note{margin:12px 0 0;font-size:13.5px;color:var(--muted)}
+
+/* ============ [C:表] 横スクロール対応 ============ */
+.table-scroll{margin:18px 0;overflow-x:auto;border-radius:var(--radius-sm);border:1px solid var(--line);background:var(--white)}
+table{border-collapse:collapse;width:100%;min-width:520px;font-size:14.5px}
+th,td{padding:12px 14px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:var(--navy);color:#fff;font-weight:800;white-space:nowrap}
+tbody tr:nth-child(even){background:var(--blue-soft)}
+tbody tr:last-child td{border-bottom:0}
+
+/* ============ [C:補足ボックス] ============ */
+.note{margin:16px 0;padding:14px 18px;border-radius:var(--radius-sm);background:var(--blue-soft);border-left:4px solid var(--blue);font-size:14px;color:var(--ink-soft)}
+.note.warn{background:#fff8ec;border-left-color:var(--warn)}
+.note b{color:var(--navy)}
+.example{margin:12px 0;padding:14px 18px;border-radius:var(--radius-sm);background:#f4f8ff;border:1px dashed var(--blue);font-size:14px}
+
+/* ============ [C:締めCTA] ============ */
+.closing{margin-top:64px;padding:clamp(30px,5vw,52px);border-radius:26px;color:#fff;text-align:center;
+  background:var(--grad-hero);box-shadow:var(--shadow-hover);position:relative;overflow:hidden}
+.closing::after{content:"";position:absolute;width:340px;height:340px;left:-120px;bottom:-160px;border-radius:50%;
+  background:radial-gradient(circle,rgba(40,211,255,.28),transparent 70%);animation:float 8s ease-in-out infinite}
+.closing-inner{position:relative;z-index:1}
+.closing h2{margin:0 0 12px;font-family:'M PLUS 1',sans-serif;font-size:clamp(20px,4vw,30px);line-height:1.45}
+.closing p{margin:0 auto 10px;max-width:38em;font-size:15px;opacity:.94}
+.closing .btn{margin-top:20px}
+.bonus{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));margin:24px 0 4px;text-align:left}
+.bonus div{padding:14px 16px;border-radius:13px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18)}
+.bonus b{display:block;font-family:'M PLUS 1',sans-serif;font-size:19px}
+.bonus span{font-size:12.5px;opacity:.85}
+
+.foot{margin-top:34px;text-align:center;font-size:12.5px;color:var(--muted)}
+
+/* [C:トップへ戻る] */
+.totop{position:fixed;right:20px;bottom:22px;z-index:50;width:48px;height:48px;border:0;border-radius:50%;cursor:pointer;
+  background:var(--navy);color:#fff;font-size:19px;box-shadow:var(--shadow);opacity:0;pointer-events:none;
+  transition:opacity .3s ease,transform .3s ease}
+.totop.show{opacity:1;pointer-events:auto}
+.totop:hover{transform:translateY(-3px)}
+
+/* ============ [C:出現アニメーション] ============ */
+.rv{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
+.rv.in{opacity:1;transform:none}
+
+@media (max-width:640px){
+  body{font-size:15.5px;line-height:1.9}
+  .step{gap:12px}
+  .step-no{flex-basis:36px;height:36px;font-size:15px}
+  .totop{right:14px;bottom:14px;width:44px;height:44px}
+}
+
+/* 動きが苦手な閲覧者には動きを止める */
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .rv{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<!-- [C:進捗バー] -->
+<div class="progress"><span id="bar"></span></div>
+
+<!-- [C:サイド進捗ナビ] -->
+<nav class="sidenav" id="sidenav" aria-label="セクション">
+  <a href="#s1"><span>インストール</span></a>
+  <a href="#s2"><span>学習させない設定</span></a>
+  <a href="#s3"><span>セキュリティ</span></a>
+  <a href="#s4"><span>フォルダ構築</span></a>
+  <a href="#s5"><span>CLAUDE.md</span></a>
+  <a href="#s6"><span>スキル</span></a>
+  <a href="#s7"><span>コネクタ</span></a>
+  <a href="#s8"><span>カスタムMCP</span></a>
+  <a href="#s9"><span>API</span></a>
+  <a href="#s10"><span>リモートコントロール</span></a>
+</nav>
+
+<div class="page">
+
+  <!-- ============ [C:ヒーロー] ============ -->
+  <header class="hero" id="hero">
+    <div class="hero-glow" id="glow"></div>
+    <div class="hero-inner">
+      <span class="badge"><span class="dot"></span>保存版資料｜CLAUDE CODE 初期設定</span>
+      <h1>プロだけがやっている<br><span class="grad">Claude Codeの初期設定10選</span></h1>
+      <p class="lead">保存版資料のお受け取り、ありがとうございます。この資料では、本編でお伝えした10個の初期設定を、実際に手を動かして進めるための手順とプロンプトつきでまとめています。上から順番に進めれば、今日からプロと同じ設定でClaude Codeを使えるようになります。</p>
+
+      <div class="hero-stats">
+        <div class="hero-stat"><b>10個</b><span>今日整える初期設定</span></div>
+        <div class="hero-stat"><b>10本</b><span>そのまま使えるコピペ用プロンプト</span></div>
+        <div class="hero-stat"><b>45本</b><span>僕が実際に使っているAPIリスト</span></div>
+      </div>
+
+      <div class="hero-cta">
+        <a class="btn" href="#howto">資料を読みはじめる →</a>
+      </div>
+
+      <div class="hero-figure">
+        <img src="assets/hero.png" alt="ノートPCの画面から10個の設定アイコンが浮かび上がるイラスト" width="1920" height="1080" fetchpriority="high">
+      </div>
+
+      <p class="hero-meta">※ このページはブックマークして、作業しながら見返してください。</p>
+    </div>
+  </header>
+
+  <!-- ============ [C:目次] ============ -->
+  <nav class="toc rv">
+    <h2>この資料の中身</h2>
+    <ol>
+      <li><a href="#s1">インストール設定（済んでいる方は飛ばしてOK）</a></li>
+      <li><a href="#s2">情報を学習させない設定</a></li>
+      <li><a href="#s3">セキュリティ設定（許可モードの使い分け）</a></li>
+      <li><a href="#s4">ローカルフォルダ構築（一撃構築プロンプトつき）</a></li>
+      <li><a href="#s5">CLAUDE.md（毎回守らせるルール）</a></li>
+      <li><a href="#s6">スキル（作業のマニュアル化）</a></li>
+      <li><a href="#s7">コネクタ（MCP）</a></li>
+      <li><a href="#s8">カスタムMCP（自分専用の接続）</a></li>
+      <li><a href="#s9">API（+ 僕が使っているAPIリスト）</a></li>
+      <li><a href="#s10">リモートコントロール</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ 使い方 ============ -->
+  <section class="sec" id="howto">
+    <p class="sec-label rv">HOW TO USE</p>
+    <h2 class="sec-title rv">はじめに：この資料の進め方</h2>
+    <p class="sec-lead rv">前提の確認と、10個の設定の全体像です。</p>
+
+    <div class="card rv">
+      <p>前提は2つだけです。<span class="hl">全部Claudeのデスクトップアプリで完結します</span>。ターミナル（黒い画面のコマンド入力ツール）は使いません。そして、Claudeの有料プランに入っていれば<span class="hl">追加料金はかかりません</span>。</p>
+
+      <figure class="figure">
+        <img src="assets/s0-map.png" alt="10個の設定が守り・土台・拡張の3ゾーンで並ぶ全体マップ" width="1600" height="900" loading="lazy">
+        <figcaption>前半1〜3は「守り」、4〜6は「土台」、7〜10が本編で特にお伝えしたかった「拡張」ゾーンです。</figcaption>
+      </figure>
+
+      <p>途中で分からなくなったら、この資料に戻る前にまず<span class="hl">Claude Code本人に聞いてください</span>。「Claude CodeのことはClaude Codeに聞く」が、10個すべてに共通する合言葉です。</p>
+
+      <div class="note">※ アプリの画面の名称やボタンの位置は、アップデートで変わることがあります。この資料は2026年8月時点の内容です。表記が違っていたら、それもClaude Codeに聞けば案内してくれます。</div>
+    </div>
+  </section>
+
+  <!-- ============ SETTING 01 ============ -->
+  <section class="sec" id="s1">
+    <p class="sec-label rv">SETTING 01</p>
+    <h2 class="sec-title rv">インストール設定</h2>
+    <p class="sec-lead rv">もうインストールが終わっている方は、この章は飛ばしてください。</p>
+
+    <div class="card rv">
+      <h3>手順</h3>
+      <div class="step">
+        <div class="step-no">1</div>
+        <div class="step-body">
+          <h4>Claudeのデスクトップアプリを公式サイトから入れる</h4>
+          <p>必ず公式サイトからダウンロードしてください。検索すると公式と何の関係もない偽サイトが出てくることがあり、そこに個人情報やカード情報を入れると流出の恐れがあります。</p>
+          <a class="toollink" href="https://claude.ai/download" target="_blank" rel="noopener">Claude 公式ダウンロード</a>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-no">2</div>
+        <div class="step-body">
+          <h4>ログインして、画面からClaude Codeに切り替える</h4>
+          <p>いつものClaudeの画面から、Claude Codeに切り替えるだけです。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-no">3</div>
+        <div class="step-body">
+          <h4>作業用のフォルダを1個作って選択する</h4>
+          <p>デスクトップなどに新しいフォルダを1個作り、Claude Codeで開けば準備完了です。このフォルダは設定4で本格的に育てます。</p>
+        </div>
+      </div>
+
+      <div class="prompt">
+        <div class="prompt-head">
+          <b>途中でエラーが出た時は、そのまま貼って本人に聞く</b>
+          <button class="copy" type="button">コピー</button>
+        </div>
+        <pre>（ここにエラー文をそのまま貼り付け）
+
+このエラーが出ました。原因を分かりやすく説明して、直せるところは直してください。</pre>
+      </div>
+
+      <div class="note"><b>ポイント：</b>「ツールを入れてください」のようなエラーが出ても焦らなくて大丈夫です。エラー文をそのまま貼れば、直し方を全部教えてくれます。</div>
+    </div>
+  </section>
+
+  <!-- ============ SETTING 02 ============ -->
+  <section class="sec" id="s2">
+    <p class="sec-label rv">SETTING 02</p>
+    <h2 class="sec-title rv">情報を学習させない設定</h2>
+    <p class="sec-lead rv">仕事の情報を入れる前に、いちばん最初に確認する設定です。</p>
+
+    <div class="card rv">
+      <p>Claudeに入れた情報は、AIの改善に使われる場合があります。そしてこの設定は<span class="hl">最初はオンになっています</span>。仕事で使うなら、ここを必ず確認してください。</p>
+
+      <h3>手順</h3>
+      <div class="step">
+        <div class="step-no">1</div>
+        <div class="step-body">
+          <h4>Claudeの設定を開く</h4>
+          <p>アプリの設定画面を開きます。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-no">2</div>
+        <div class="step-body">
+          <h4>「モデルの改善に使うかどうか」の項目をオフにする</h4>
+          <p>設定の中にデータをAIの改善に使うかどうかの項目があるので、気になる方はオフにしておきます。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-no">3</div>
+        <div class="step-body">
+          <h4>位置情報の設定も合わせてチェックする</h4>
+          <p>位置情報を送る設定もあるので、そこも合わせて確認しておきます。</p>
+        </div>
+      </div>
+
+      <div class="note"><b>ポイント：</b>Claude Codeは、自分の情報を入れるほど自分の事業に合わせて動いてくれるツールです。このあとの設定で会社の情報をどんどん入れていくので、情報を守る設定を先に固めておきます。</div>
+    </div>
+  </section>
+
+  <!-- ============ SETTING 03 ============ -->
+  <section class="sec" id="s3">
+    <p class="sec-label rv">SETTING 03</p>
+    <h2 class="sec-title rv">セキュリティ設定（許可モード）</h2>
+    <p class="sec-lead rv">毎回出てくる「実行していいですか？」の確認を、安全にスキップします。</p>
+
+    <div class="card rv">
+      <p>Claude Codeには「許可モード」が4つあります。まず全体像です。</p>
+
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>モード</th><th>動き</th><th>使いどころ</th></tr></thead>
+          <tbody>
+            <tr><td>許可確認</td><td>実行のたびに毎回確認してくる</td><td>最初はこれ。動きに慣れるまで</td></tr>
+            <tr><td>自動権限</td><td>必要な時だけAIが確認してくる</td><td>慣れてきたら普段の作業はこれ</td></tr>
+            <tr><td>プラン</td><td>計画だけ立てて実行はしない</td><td>大きい作業を頼む時だけ</td></tr>
+            <tr><td>バイパス権限</td><td>確認を全部スキップする</td><td>リスクを分かっている人向け。今日は選ばなくてOK</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>結局どうすればいいか</h3>
+      <p>使い分けはシンプルです。<span class="hl">まずは「許可確認」のまま使い始めて、Claude Codeの動きに慣れてきたら普段の作業は「自動権限」に切り替える</span>。切り替えはチャット画面のモード選択からいつでもできます。「プラン」は大きい作業の前に計画だけ立てさせて、納得してから実行させると、意図とズレたものが出来上がる事故が減ります。</p>
+
+      <h3>月1回の棚卸し</h3>
+      <p>使っていると、許可した操作がどんどん増えていきます。月1回くらい、このプロンプトで棚卸しするのがおすすめです。</p>
+
+      <div class="prompt">
+        <div class="prompt-head">
+          <b>許可リストの棚卸し（月1回）</b>
+          <button class="copy" type="button">コピー</button>
+        </div>
+        <pre>今の許可リストを教えて。整理した方がいいものがあれば提案して。</pre>
+      </div>
+
+      <div class="note warn"><b>注意：</b>この使い分けを何も考えずに最初から全部自動にしてしまうと、個人情報の流出や大事なデータの削除など、思わぬ事故につながります。ここは必ず設定しておいてください。</div>
+    </div>
+  </section>
+
+  <!-- ============ SETTING 04 ============ -->
+  <section class="sec" id="s4">
+    <p class="sec-label rv">SETTING 04</p>
+    <h2 class="sec-title rv">ローカルフォルダ構築</h2>
+    <p class="sec-lead rv">10個の中でいちばん差がつく設定です。一撃構築プロンプトつき。</p>
+
+    <div class="card rv">
+      <p>ローカルフォルダ（自分のパソコンの中のフォルダ）は、Claude Codeの<span class="hl">作業場所そのもの</span>です。普通のチャットのAIと違って、Claude Codeはフォルダに入ってファイルを直接読み書きしながら働きます。だから、どんなフォルダを用意してあげるかで仕事の質が全部変わります。</p>
+
+      <figure class="figure">
+        <img src="assets/s4-figure.png" alt="散らかったデスクトップと、整理されたフォルダの中で働くAIのビフォーアフター図" width="1600" height="900" loading="lazy">
+        <figcaption>ファイルが散らばった状態ではAIも欲しい情報を探せません。整理されたフォルダは、そのままAIの実力になります。</figcaption>
+      </figure>
+
+      <p>自分の会社の情報・商品の情報・過去の発信が整理されて入っていると、AIの答えが一般論ではなく自分の事業に合わせたものになります。僕の場合は、事業部ごとにフォルダを分けて、会社の情報を全部この中に入れています。</p>
+
+      <h3>最適なフォルダ構造を一撃で構築するプロンプト</h3>
+      <p>本編でお約束した、フォルダ構造を一撃で作るプロンプトです。Claude Codeに貼ると、あなたの仕事内容をヒアリングした上で、AIが働きやすいフォルダ一式を作ってくれます。</p>
+
+      <div class="prompt">
+        <div class="prompt-head">
+          <b>フォルダ構造 一撃構築プロンプト</b>
+          <button class="copy" type="button">コピー</button>
+        </div>
+        <pre>あなたに、私の仕事用フォルダの設計をお願いします。
+これから、このフォルダをあなた（Claude Code）の作業場所として使います。
+
+【やってほしいこと】
+1. まず、次のことを私に1つずつ質問してください。
+   - どんな事業・仕事をしているか（複数あれば全部）
+   - よくやる作業（例: SNS投稿づくり、資料作成、経理、リサーチ）
+   - すでに持っている情報・ファイルの種類（例: 過去の投稿、商品資料、お客様とのやり取り）
+2. 私の回答をもとに、次の3種類の情報が分かれて収まるフォルダ構成を設計してください。
+   - パーソナルナレッジ: 私自身の考え方・経歴・文体など「私の情報」
+   - プロダクトナレッジ: 商品・サービス・お客様に関する情報
+   - コンテンツナレッジ: 過去の発信物・制作物・参考資料
+3. 事業や部署ごとにフォルダを分けて、それぞれに「何を入れるフォルダか」を書いたREADME.md（説明書きファイル）を作ってください。
+4. 最後に、今後あなたが成果物を保存する時の「保存先の判断ルール」を1枚のファイル（directory.md）にまとめてください。
+
+【条件】
+- フォルダ名は、ITに詳しくない人でも意味が分かる日本語にすること
+- 階層を深くしすぎないこと（3階層まで）
+- 分からないことは推測せず、私に質問すること</pre>
+      </div>
+
+      <div class="note"><b>ポイント：</b>何を入れればいいか分からない時も、AIに聞けばOKです。「この仕事を任せるのに必要な情報は何？」と送ると、必要なものをAIが指定してくれます。まず情報を入れる箱を作っておく——これで、あとの設定が全部生きてきます。</div>
+    </div>
+  </section>
+
+  <!-- ============ SETTING 05 ============ -->
+  <section class="sec" id="s5">
+    <p class="sec-label rv">SETTING 05</p>
+    <h2 class="sec-title rv">CLAUDE.md（毎回守らせるルール）</h2>
+    <p class="sec-lead rv">同じ注意を毎回しなくてよくなるファイルです。</p>
+
+    <div class="card rv">
+      <p>CLAUDE.mdは、Claudeに毎回守らせるルールを書くファイルです。1回書いておくと、Claude Codeが毎回それを守って動いてくれます。設定していないと毎回細かい修正を指示する羽目になりますが、書いておくとやり直しが激減して、AIの動きのブレが全然なくなります。</p>
+
+      <div class="prompt">
+        <div class="prompt-head">
+          <b>CLAUDE.mdを作らせるプロンプト</b>
+          <button class="copy" type="button">コピー</button>
+        </div>
+        <pre>このフォルダに、あなたが毎回守るルールを書いたCLAUDE.mdを作ってください。
+
+まずは次の3つのルールから始めます。
+- すべて日本語で回答すること
+- （守ってほしいフォルダ名）の中は変更しないこと
+- ファイルを削除する時は、消さずに「_ごみ箱」フォルダに移すこと
+
+私の仕事内容を踏まえて、他に入れておくべきルールがあれば提案してください。</pre>
+      </div>
+
+      <div class="note"><b>ポイント：</b>最初から完璧を目指さなくて大丈夫です。まず作ってもらって、使いながら気になったルールを足していけばOK。CLAUDE.mdは全体用とフォルダごとの2種類を置けますが、細かい置き場所もAIに任せておけば大丈夫です。</div>
+    </div>
+  </section>
+
+  <!-- ============ SETTING 06 ============ -->
+  <section class="sec" id="s6">
+    <p class="sec-label rv">SETTING 06</p>
+    <h2 class="sec-title rv">スキル（作業のマニュアル化）</h2>
+    <p class="sec-lead rv">一度覚えさせれば、毎回説明しなくても同じ品質で動きます。</p>
+
+    <div class="card rv">
+      <p>スキルは、AIに覚えさせる作業のマニュアルのようなものです。CLAUDE.mdが「毎回守る全体のルール」なのに対して、スキルは「作業ごとのマニュアル」。僕はYouTubeのリサーチやX投稿の作成など、よくやる作業を全部スキルにしています。</p>
+
+      <h3>作り方</h3>
+      <div class="step">
+        <div class="step-no">1</div>
+        <div class="step-body">
+          <h4>まず一度、普通にClaude Codeに頼んで作業してもらう</h4>
+          <p>やり取りしながら、満足のいく内容になるまで仕上げます。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-no">2</div>
+        <div class="step-body">
+          <h4>満足のいく内容になったら、このプロンプトを入力する</h4>
+          <p>スキルクリエイター（スキルを作るためのスキル）が最初から入っているので、書き方を覚える必要はありません。</p>
+        </div>
+      </div>
+
+      <div class="prompt">
+        <div class="prompt-head">
+          <b>スキル化プロンプト</b>
+          <button class="copy" type="button">コピー</button>
+        </div>
+        <pre>これまでのやり取りを全部参照して、このタスクをスキル化してください。</pre>
+      </div>
+
+      <div class="prompt">
+        <div class="prompt-head">
+          <b>コツ：使い回せるスキルにする一言</b>
+          <button class="copy" type="button">コピー</button>
+        </div>
+        <pre>他の作業でも使えるように抽象化して。</pre>
+      </div>
+
+      <div class="note"><b>ポイント：</b>「抽象化して」を付け足しておくと、似た作業に全部使い回せるスキルになります。Claudeに言ってスキルを作って、そのスキルで仕事を回していく——僕の会社の仕組みは全部この形です。</div>
+    </div>
+  </section>
+
+  <!-- ============ SETTING 07 ============ -->
+  <section class="sec" id="s7">
+    <p class="sec-label rv">SETTING 07</p>
+    <h2 class="sec-title rv">コネクタ（MCP）</h2>
+    <p class="sec-lead rv">ここからの3つが、特にお伝えしたかったメイン機能です。</p>
+
+    <div class="card rv">
+      <p>コネクタは、GmailやSlack、Notionなど外部のツールをClaudeにつなげる機能です。たとえばGmailをつなぐと、メールを読んで返信案を作るところまで頼めるようになります。僕の会社では、Gmailの管理はAIの仕事の1つです。</p>
+
+      <h3>つなぎ方（3ステップ）</h3>
+      <div class="step">
+        <div class="step-no">1</div>
+        <div class="step-body">
+          <h4>Claudeの設定から「コネクタ」の画面を開く</h4>
+          <p>設定画面にコネクタの一覧があります。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-no">2</div>
+        <div class="step-body">
+          <h4>一覧からつなぎたいツールを選んで「接続」を押す</h4>
+          <p>SlackやNotion、Driveなど、仕事で使う定番のツールはだいたい並んでいます。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-no">3</div>
+        <div class="step-body">
+          <h4>そのツールのアカウントでログインして、許可を押したら完了</h4>
+          <p>プログラミングは何もいりません。</p>
+          <div class="example">例：Gmailをつないだら、こう頼めます →「直近3日で返信が必要なメールをピックアップして、返信案も作って」</div>
+        </div>
+      </div>
+
+      <div class="prompt">
+        <div class="prompt-head">
+          <b>Gmail連携の実例プロンプト</b>
+          <button class="copy" type="button">コピー</button>
+        </div>
+        <pre>直近3日で返信が必要なメールをピックアップして、返信案も作って。</pre>
+      </div>
+
+      <h3>コネクタの中身は「MCP」</h3>
+      <p>このコネクタ、中身は<span class="hl">MCP（AI専用の窓口）</span>という仕組みで動いています。外部ツールの説明書は人間向けで辞書みたいに分厚く、AIが毎回全部読むと一度に覚えておける量が埋まってパンクしてしまいます。MCPは「これとこれができますよ」という一覧だけをAIに分かる形で短く返してくれる、AIのために整えられた窓口です。この名前は次の設定でも出てくるので、「コネクタの中身はMCP」とだけ覚えておいてください。</p>
+
+      <figure class="figure">
+        <img src="assets/s7-figure.png" alt="1つのサービスに人間用・プログラム用・AI用の3つの入り口が並ぶ図" width="1600" height="900" loading="lazy">
+        <figcaption>サービスの入り口は相手ごとに3つ。人間は画面（UI）、プログラムはAPI、AIはMCPを使います。詳しくは設定9で整理します。</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ============ SETTING 08 ============ -->
+  <section class="sec" id="s8">
+    <p class="sec-label rv">SETTING 08</p>
+    <h2 class="sec-title rv">カスタムMCP（自分専用の接続）</h2>
+    <p class="sec-lead rv">一覧に用意されていないツールでも、接続を自分で作れます。</p>
+
+    <div class="card rv">
+      <p>コネクタはClaude側があらかじめ用意したものをつなぐ機能でしたが、用意されていないツールでも自分専用の接続を作れます。僕の実例だと、会社で使っているDiscord（チャットアプリ）につないで、Discordの中にAI社員が住んでいる状態を作っています。スマホからDiscordで話しかけると家のPCのClaude Codeが動いて、仕事が終わったら向こうから報告まで送ってきます。</p>
+
+      <h3>繋ぎ方の考え方</h3>
+      <p>カスタムMCPは<span class="hl">「接続プログラムを作る」「それをClaudeに登録する」の2段階だけ</span>です。コネクタはこの2つが最初から済んでいて、一覧から選ぶだけの状態でした。一覧にないツールはここを自分でやる——これがカスタムMCPの正体です。作る方はClaude Codeに丸投げでOKです。</p>
+
+      <h3>Discordの場合（3ステップ）</h3>
+      <div class="step">
+        <div class="step-no">1</div>
+        <div class="step-body">
+          <h4>Discordのアカウントと自分のサーバーを1個用意する</h4>
+          <p>無料で作れます。</p>
+          <a class="toollink" href="https://discord.com/" target="_blank" rel="noopener">Discord 公式</a>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-no">2</div>
+        <div class="step-body">
+          <h4>Claude Codeに「DiscordとつなぐMCPを作って」と伝える</h4>
+          <p>AIから来る質問にチャットで答えていくだけです。設定1で言った「接続プログラム」がこのMCPにあたります。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-no">3</div>
+        <div class="step-body">
+          <h4>出来上がったら、Claudeのコネクタ設定から登録する</h4>
+          <p>コネクタ設定にある「カスタムコネクタを追加」から登録すれば接続完了です。登録が分からなくても、「今作ったやつをClaudeにつないで」と頼めば手順を案内してくれます。途中でAIが画面を操作して、代わりに設定してくれる場面もあります。</p>
+        </div>
+      </div>
+
+      <div class="prompt">
+        <div class="prompt-head">
+          <b>カスタムMCPを作らせるプロンプト</b>
+          <button class="copy" type="button">コピー</button>
+        </div>
+        <pre>DiscordとつなぐMCPを作ってください。
+必要な情報があれば、1つずつ質問してください。
+出来上がったら、Claudeにつなぐ手順も案内してください。</pre>
+      </div>
+
+      <div class="note warn"><b>注意：</b>途中でトークン（Discord側に作るAI用アカウント＝Botを動かすための合いことば）が出てきます。これはパスワードと同じものなので、人に見せないようにだけ注意してください。</div>
+    </div>
+  </section>
+
+  <!-- ============ SETTING 09 ============ -->
+  <section class="sec" id="s9">
+    <p class="sec-label rv">SETTING 09</p>
+    <h2 class="sec-title rv">API（+ 僕が使っているAPIリスト）</h2>
+    <p class="sec-lead rv">リサーチや投稿収集を自動化する、いちばん伸びしろのある設定です。</p>
+
+    <div class="card rv">
+      <p>API（外部のサービスとやり取りするための機械用の窓口）は、YouTubeならYouTube Data API、XならX APIのように、大体のサービスに用意されています。</p>
+
+      <h3>コネクタと何が違うのか</h3>
+      <p>実はコネクタも、裏側ではこのAPIを使っています。整理すると、サービスの入り口は相手ごとに3つあります。</p>
+
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>誰が</th><th>入り口</th><th>やり方</th></tr></thead>
+          <tbody>
+            <tr><td>人間</td><td>画面（UI）</td><td>画面を見てポチポチ操作する</td></tr>
+            <tr><td>プログラム</td><td>API</td><td>機械用の窓口に、決まった形の文でお願いする</td></tr>
+            <tr><td>AI</td><td>MCP</td><td>AI専用の窓口で「何ができるか」を教えてもらってお願いする</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>コネクタとカスタムMCPは「何ができるか」の一覧の中からお願いする方式で、カスタムMCPはその一覧を自作して増やす方式でした。<span class="hl">APIは機械用の窓口に直接つなぎにいくので、どんなデータをどう取ってくるかまで全部自分で決められます</span>。Claude Codeは自分でプログラムを書けるので、この機械用の窓口にも直接つなぎにいけます。たとえば僕はYouTubeのAPIをつないで、伸びている動画のデータを自動で集めてリサーチシートにまとめるところまで全部Claude Codeにやらせています。</p>
+
+      <h3>つなぎ方（3ステップ）</h3>
+      <div class="step">
+        <div class="step-no">1</div>
+        <div class="step-body">
+          <h4>つなぎたいサービスの公式サイトでAPIキーを発行する</h4>
+          <p>発行といっても難しいことはなく、公式サイトの開発者向けページにログインして「APIキーを作成」のようなボタンを押すだけです。出てきた文字列がAPIキー。発行ページの場所は、下のAPIリストの「取得先」から飛べます。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-no">2</div>
+        <div class="step-body">
+          <h4>Claude Codeに「このサービスのAPIをつなぎたい」と伝える</h4>
+          <p>すると「.env」という鍵の保管ファイルを作ってくれて、「ここにキーを貼ってください」と案内されます。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-no">3</div>
+        <div class="step-body">
+          <h4>そのファイルの該当の場所に、発行したキーを自分でコピペする</h4>
+          <p>これだけです。あとのセットアップは全部AIがやってくれます。</p>
+        </div>
+      </div>
+
+      <div class="prompt">
+        <div class="prompt-head">
+          <b>API接続の依頼プロンプト（.env保管つき）</b>
+          <button class="copy" type="button">コピー</button>
+        </div>
+        <pre>（サービス名）のAPIをつなぎたいです。
+
+1. まず、APIキーを保管するための.envファイルを作って、どこに何を貼ればいいか教えてください。
+2. APIキーの発行ページの場所も案内してください。
+3. 私がキーを貼り終えたら、残りの接続設定をお願いします。</pre>
+      </div>
+
+      <div class="note warn"><b>注意：</b>APIキーはパスワードと同じものです。人に見せない・画面に映さない・どこにも貼らない。この3つは徹底してください。自分のパソコンの中でClaude Codeに使わせるのはOKです（だから.envに直接貼ります。チャットにも貼りません）。</div>
+
+      <h3>僕が実際に使っているAPIリスト</h3>
+      <p>本編でお約束したAPIリストです。色々検証した中で、簡単で便利かつコスパの良いものを使っています。それぞれ何ができるかと、キーの取得先（公式の開発者向けページ）を載せているので、気になったものからつないでみてください。</p>
+
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>API</th><th>何ができるか</th><th>取得先</th></tr></thead>
+          <tbody>
+            <tr><td>Anthropic API（Claude API）</td><td>AIアシスタント「Claude」を自分のツールや業務フローから呼び出せます。文章の作成・要約・分析などを自動で行わせることができます。<br><span style="font-size:12.5px;color:#5c6880">※ 公式サイト（platform.claude.com）で無料登録後、管理画面からAPIキー（利用するための鍵）を発行。利用量に応じた従量課金です。</span></td><td><a href="https://platform.claude.com/docs/en/home" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>OpenAI API</td><td>ChatGPTでおなじみのGPTシリーズのAIを、自分のアプリや作業から直接使えます。文章生成のほか音声や画像の処理にも対応しています。<br><span style="font-size:12.5px;color:#5c6880">※ platform.openai.comでアカウント登録し、管理画面からAPIキーを発行。使った分だけ支払う従量課金です。</span></td><td><a href="https://developers.openai.com/api/docs" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>OpenAI Images API（gpt-image系）</td><td>文章で指示するだけでAIが画像を新しく作ったり、既存の画像を部分的に描き直したり（編集）できます。バナーやサムネイル作りに使えます。<br><span style="font-size:12.5px;color:#5c6880">※ OpenAI APIと同じアカウント・APIキーで利用可。生成枚数や画質に応じた従量課金で、一部モデルは組織確認（本人確認）が必要な場合があります。</span></td><td><a href="https://developers.openai.com/api/docs/guides/image-generation" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>Gemini API（Google）</td><td>GoogleのAI「Gemini」を自分のアプリから使えます。文章だけでなく画像・音声・動画もまとめて理解させられるのが特徴です。<br><span style="font-size:12.5px;color:#5c6880">※ Google AI Studio（ブラウザの管理画面）から無料でAPIキーを発行でき、無料枠あり。本格利用は従量課金です。</span></td><td><a href="https://ai.google.dev/gemini-api/docs" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>xAI API（Grok API）</td><td>X（旧Twitter）系列のxAI社が作ったAI「Grok」を呼び出せます。文章生成や画像の読み取り・画像生成に対応しています。<br><span style="font-size:12.5px;color:#5c6880">※ console.x.ai でアカウント登録し、管理画面からAPIキーを発行。利用量に応じた従量課金です。</span></td><td><a href="https://docs.x.ai/developers/introduction" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>Groq API</td><td>専用チップで動く「とにかく返答が速い」AI実行サービスです。Llamaなどの公開AIモデルを、体感ほぼ待ち時間なしで使えます。<br><span style="font-size:12.5px;color:#5c6880">※ console.groq.com で登録し管理画面からAPIキーを発行。無料枠があり、xAIのGrokとは別会社・別サービスです。</span></td><td><a href="https://console.groq.com/docs/overview" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>fal.ai API</td><td>画像・動画・音声などを作るAIモデル（自動生成の仕組み）を、1つの窓口からまとめて呼び出せるサービスです。1,000種類以上のモデルから選んで、プログラムから画像生成などを実行できます。<br><span style="font-size:12.5px;color:#5c6880">※ fal.aiのダッシュボード（管理画面）から無料でAPIキーを発行でき、使った分だけ支払う従量課金制です。</span></td><td><a href="https://fal.ai/docs" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>X API（旧Twitter API）</td><td>X（旧Twitter）の投稿を自動で行ったり、投稿やユーザーの情報を取得したりできる仕組みです。予約投稿ツールや分析ツールの土台になっています。<br><span style="font-size:12.5px;color:#5c6880">※ developer.x.comでデベロッパーアカウント（開発者登録）が必要。無料枠は投稿数などに制限があり、本格利用は有料プランです。</span></td><td><a href="https://developer.x.com/" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>YouTube Data API v3</td><td>YouTubeの動画・チャンネル・再生リストの情報を取得したり、動画のアップロードやタイトル変更などをプログラムから行える仕組みです。<br><span style="font-size:12.5px;color:#5c6880">※ Google Cloudの管理画面でプロジェクトを作りAPIを有効化して使います。無料ですが1日あたりの利用量（クォータ）に上限があります。</span></td><td><a href="https://developers.google.com/youtube/v3/getting-started" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>YouTube Analytics API</td><td>自分のYouTubeチャンネルの再生回数・視聴時間・視聴者層などの分析データ（アナリティクス）を、プログラムで取り出せる仕組みです。レポートの自動作成に使えます。<br><span style="font-size:12.5px;color:#5c6880">※ 無料。自分のチャンネルのデータを見るため、Googleアカウントでの認証（OAuth＝本人許可の手続き）が必要です。</span></td><td><a href="https://developers.google.com/youtube/analytics" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>OmniSocials API</td><td>Instagram・X・TikTokなど最大11のSNSへの投稿・予約・分析確認を、ひとつのAPI（外部連携の窓口）からまとめて行えます。<br><span style="font-size:12.5px;color:#5c6880">※ 有料サービス（月10ドル〜、14日間無料トライアルあり）で、APIキーはapp.omnisocials.comの設定画面から発行します。全プランでAPI利用可能です。</span></td><td><a href="https://omnisocials.com/api" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>Threads API（Meta）</td><td>Metaが提供する、Threadsへの投稿・返信・閲覧データの取得をプログラムから行える仕組みです。予約投稿や自動投稿ツールに使われています。<br><span style="font-size:12.5px;color:#5c6880">※ Meta for Developersでアプリ登録が必要。無料ですが、本番利用にはMetaの審査（技術提供者の確認）が入る場合があります。</span></td><td><a href="https://developers.facebook.com/docs/threads" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>Instagram Platform API（Meta）</td><td>Instagramのビジネス・クリエイターアカウント（プロアカウント）向けに、投稿の公開・コメント返信・データ取得などをプログラムから行える仕組みです。<br><span style="font-size:12.5px;color:#5c6880">※ Meta for Developersでのアプリ登録とプロアカウントが必要。無料ですが、機能によってはMetaの審査（アプリレビュー）があります。</span></td><td><a href="https://developers.facebook.com/docs/instagram-platform" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>Meta Marketing API</td><td>FacebookやInstagramの広告を、プログラム（自動の仕組み）から出稿・管理・成果確認できます。広告キャンペーンの作成から効果測定までをまとめて自動化できます。<br><span style="font-size:12.5px;color:#5c6880">※ API自体は無料ですが、Meta for Developersでのアプリ作成と有効な広告アカウントが必要で、利用範囲によっては審査（アプリレビュー）があります。</span></td><td><a href="https://developers.facebook.com/docs/marketing-api/" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>TikTok Research API</td><td>TikTokの公開されている動画やアカウントのデータを、研究目的で取得・分析できます。どんな投稿がどれくらい見られているかなどを調べられます。<br><span style="font-size:12.5px;color:#5c6880">※ 米国・欧州の非営利大学等の学術研究者向けで、申請と審査が必要です（一般の事業者は原則利用できません。回答まで約4週間）。</span></td><td><a href="https://developers.tiktok.com/products/research-api/" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>Typefully API</td><td>X（旧Twitter）やLinkedIn、Threadsなどへの投稿の下書き作成・予約投稿・公開を、外部のツールから自動で行えます。<br><span style="font-size:12.5px;color:#5c6880">※ Typefullyの管理画面（Settings → API）からAPIキー（合言葉のような認証コード）を発行して使います。2025年12月に新版のv2が公開されています。</span></td><td><a href="https://typefully.com/docs/api" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>Metricool API</td><td>InstagramやX、TikTokなど複数SNSへの予約投稿や、分析データの取り出しを外部から自動で行えます。<br><span style="font-size:12.5px;color:#5c6880">※ 上位プラン（Advanced／Custom）限定の機能で、管理画面のAccount Settings → APIから発行します。</span></td><td><a href="https://app.metricool.com/resources/apidocs/index.html" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>SocialData API</td><td>X（旧Twitter）の投稿・プロフィール・フォロワーなどの公開データを、公式の高額なAPIを使わずに取得できる外部サービスです。<br><span style="font-size:12.5px;color:#5c6880">※ 月額制ではなく、事前チャージした残高から使った分だけ支払う従量課金です（残高の有効期限なし）。X社の公式APIではない点に注意が必要です。</span></td><td><a href="https://docs.socialdata.tools/" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>SociaVault API</td><td>InstagramやTikTok、YouTubeなど25以上のSNSから、公開されている投稿やプロフィールのデータをまとめて取得できるサービスです。フォロワー数の推移チェックや投稿の分析に使えます。<br><span style="font-size:12.5px;color:#5c6880">※ サイトから無料登録するとお試し用のクレジット（利用枠）がもらえ、クレジットカードなしで試せます。本格利用は有料のクレジット購入制です。</span></td><td><a href="https://docs.sociavault.com/" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>Perplexity API</td><td>AI検索サービスPerplexityの仕組みを自分のツールから使えるAPI（外部から機能を呼び出す窓口）です。最新のWeb情報をもとに、出典つきの回答文や検索結果を返してくれます。<br><span style="font-size:12.5px;color:#5c6880">※ Perplexityのサイト内のAPIポータル（管理画面）でAPIキーを発行して使う、使った分だけ支払う有料制です。</span></td><td><a href="https://docs.perplexity.ai/" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>Firecrawl API</td><td>指定したWebサイトの中身を読み取り、AIが扱いやすいきれいな文章データに変換してくれるサービスです。サイト全体を巡回してまとめて取り込むこともできます。<br><span style="font-size:12.5px;color:#5c6880">※ 公式サイトで無料登録するとAPIキーが発行され、無料枠つき・使用量に応じた有料プランがあります。</span></td><td><a href="https://docs.firecrawl.dev/" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>Apify API</td><td>Webサイトやアプリからデータを集める「Actor（アクター）」と呼ばれる既製の収集プログラムを、外部から動かしたり結果を受け取ったりできるサービスです。何千種類もの既製ツールを選んで使えます。<br><span style="font-size:12.5px;color:#5c6880">※ 無料登録で管理画面（Console）からAPIトークンを発行。無料枠あり、超過分は従量課金です。</span></td><td><a href="https://docs.apify.com/api" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>Bright Data API</td><td>大規模なWebデータ収集の専門サービスで、ブロックされにくい仕組みを使ってWebページや検索結果、SNSなどの公開データを取得できます。企業向けの本格的なデータ収集基盤です。<br><span style="font-size:12.5px;color:#5c6880">※ アカウント登録後に管理画面からAPIキーを発行する有料サービスで、法人利用が中心。利用目的の確認（審査）が入る場合があります。</span></td><td><a href="https://docs.brightdata.com/" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>ScrapeCreators API</td><td>TikTok・Instagram・YouTubeなど36以上のSNSから、公開されているプロフィールや投稿・動画のデータを取得できるサービスです。クリエイターやインフルエンサーの調査に向いています。<br><span style="font-size:12.5px;color:#5c6880">※ 公式アプリ（app.scrapecreators.com）で無料登録するとAPIキーが発行され、無料お試し枠つきの従量課金制です。</span></td><td><a href="https://docs.scrapecreators.com/" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>PLAUD 開発者プラットフォーム（Plaud Dev API）</td><td>PLAUDの録音データから作られた文字起こしや要約を、自分のシステムやアプリに取り込めます。会話の記録を他のツール（顧客管理など）に自動で流し込む使い方ができます。<br><span style="font-size:12.5px;color:#5c6880">※ 主に企業向けで、dev.plaud.ai からの利用申請（審査）が必要です。個人が自分の録音データをAIに読ませたいだけなら、公式のMCP連携（外部AIとつなぐ仕組み）が案内されています。</span></td><td><a href="https://docs.plaud.ai/overview" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>Zoom API</td><td>Zoomのミーティング作成・参加者情報・録画データなどをプログラムから取り扱えます。会議の予約や録画の取得を自動化できます。<br><span style="font-size:12.5px;color:#5c6880">※ Zoom App Marketplaceで無料でアプリを作成し、認証情報（APIを使うための鍵）を発行して利用します。Zoomアカウントがあれば始められます。</span></td><td><a href="https://developers.zoom.us/docs/api/" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>MindMeister API</td><td>MindMeisterで作ったマインドマップ（考えを枝分かれで整理した図）のデータを、外部のプログラムから読み書きできます。<br><span style="font-size:12.5px;color:#5c6880">※ OAuth 2.0（アカウント連携の認証方式）でのアプリ登録のほか、登録なしで使えるパーソナルアクセストークン（自分専用の鍵）の発行にも対応しています。</span></td><td><a href="https://developers.mindmeister.com/" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>Loom SDK / Loom API</td><td>画面録画ツールLoomの録画・埋め込み機能を、自分のサービスやアプリの中に組み込めます。録画した動画の管理も行えます。<br><span style="font-size:12.5px;color:#5c6880">※ 開発者向けページから無料で始められるとされています（プランによる制限の詳細は公式ページで要確認）。</span></td><td><a href="https://dev.loom.com/" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>UTAGE API・MCP連携</td><td>UTAGEのファネル（販売ページの流れ）やページの作成・編集、メール・LINE配信の管理をプログラムやAIツールから操作できます。ZapierなどとつないだWeb作業の自動化にも使えます。<br><span style="font-size:12.5px;color:#5c6880">※ 2026年4月に公開された新しい機能で、UTAGE管理画面右上の「API設定」からAPIキーを発行して使います。詳細ドキュメントは docs.utage-system.com にあります。</span></td><td><a href="https://help.utage-system.com/archives/25648" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>freee API</td><td>会計ソフトfreeeの取引データ・請求書・経費などをプログラムから登録・取得できます。売上データの自動記帳や他ツールとの連携に使えます。<br><span style="font-size:12.5px;color:#5c6880">※ freeeアカウントがあれば無料でアプリ登録してAPIを使えます。開発用のテスト事業所も無料で作成できます。</span></td><td><a href="https://developer.freee.co.jp/" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>LINE Messaging API</td><td>LINE公式アカウントから、友だち登録してくれた人へ自動でメッセージを送ったり、返信したりできます。予約リマインドやお知らせ配信の自動化に使えます。<br><span style="font-size:12.5px;color:#5c6880">※ 無料で始められます。LINE公式アカウントを作り、LINE Developersの管理画面からチャネル（接続用の窓口）を作成して利用します。月の無料メッセージ数を超える送信は有料です。</span></td><td><a href="https://developers.line.biz/ja/docs/messaging-api/overview/" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>Chatwork API</td><td>ChatworkのチャットルームへプログラムからメッセージやタスクLを送れます。日報の自動投稿や、他ツールからの通知の集約などに使えます。<br><span style="font-size:12.5px;color:#5c6880">※ Chatworkの利用者本人が管理画面（サービス連携設定）からAPIトークン（合言葉のような鍵）を発行して使います。</span></td><td><a href="https://developer.chatwork.com/docs/getting-started" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>Discord API（Bot開発）</td><td>Discordのサーバー内で動くBot（自動応答ロボット）を作れます。メッセージの自動投稿、質問への自動返信、メンバー管理などができます。<br><span style="font-size:12.5px;color:#5c6880">※ 無料です。Discord Developer Portal（開発者向け管理画面）でアプリケーションを作成し、Botのトークンを発行して使います。</span></td><td><a href="https://discord.com/developers/docs" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>Slack API</td><td>Slackのチャンネルへ自動でメッセージを送ったり、ワークフロー（決まった作業の流れ）を組んだりできます。売上通知や外部ツールとの連携によく使われます。<br><span style="font-size:12.5px;color:#5c6880">※ 無料で利用可能です。api.slack.com の管理画面でアプリを作成し、ワークスペースにインストールしてトークンを取得します。</span></td><td><a href="https://api.slack.com/docs" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>Notion API</td><td>Notionのページやデータベース（表形式の管理台帳）を外部から読み書きできます。顧客リストへの自動追記や、他ツールとのデータ連携ができます。<br><span style="font-size:12.5px;color:#5c6880">※ 無料です。Notionの設定画面からインテグレーション（連携用の窓口）を作成してシークレットキーを発行し、対象ページに接続許可を与えて使います。</span></td><td><a href="https://developers.notion.com/" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>Trello API</td><td>Trelloのボードやカード（付箋のようなタスク札）を外部から作成・移動・更新できます。タスクの自動登録や進捗の自動整理に使えます。<br><span style="font-size:12.5px;color:#5c6880">※ 無料で使えます。取得にはまずPower-Up（Trelloの拡張機能）を管理画面で作成し、それに紐づくAPIキーとトークンを発行する手順が必要です。</span></td><td><a href="https://developer.atlassian.com/cloud/trello/rest/" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>Google Docs API</td><td>Googleドキュメント（Googleの文書作成サービス）の文書を、プログラム（自動処理）から作ったり、文章を書き込んだり書き換えたりできます。定型文書の自動作成などに使えます。<br><span style="font-size:12.5px;color:#5c6880">※ API自体は無料。Google Cloudの管理画面（コンソール）でAPIを有効化し、認証情報を発行して使います。</span></td><td><a href="https://developers.google.com/workspace/docs/api/reference/rest" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>Google Sheets API</td><td>Googleスプレッドシート（表計算サービス）のデータを自動で読み書きできます。売上の記録を自動でシートに書き込む、といった使い方ができます。<br><span style="font-size:12.5px;color:#5c6880">※ API自体は無料。Google Cloudの管理画面でAPIを有効化し、認証情報を発行して使います。</span></td><td><a href="https://developers.google.com/workspace/sheets/api/reference/rest" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>Google Slides API</td><td>Googleスライド（プレゼン資料作成サービス）のスライドを自動で作成・編集できます。ひな形から資料を量産する、といった使い方ができます。<br><span style="font-size:12.5px;color:#5c6880">※ API自体は無料。Google Cloudの管理画面でAPIを有効化し、認証情報を発行して使います。</span></td><td><a href="https://developers.google.com/workspace/slides/api/reference/rest" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>Google Drive API</td><td>Googleドライブ（オンラインのファイル置き場）のファイルを自動で保存・検索・共有設定できます。作った資料を自動でフォルダに入れる、といった使い方ができます。<br><span style="font-size:12.5px;color:#5c6880">※ API自体は無料。Google Cloudの管理画面でAPIを有効化し、認証情報を発行して使います。</span></td><td><a href="https://developers.google.com/workspace/drive/api/guides/about-sdk" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>Google Calendar API</td><td>Googleカレンダーの予定を自動で登録・変更・取得できます。予約が入ったら自動でカレンダーに予定を入れる、といった使い方ができます。<br><span style="font-size:12.5px;color:#5c6880">※ API自体は無料。Google Cloudの管理画面でAPIを有効化し、認証情報を発行して使います。</span></td><td><a href="https://developers.google.com/workspace/calendar/api/guides/overview" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>Gmail API</td><td>Gmailのメールを自動で読み取ったり、送信したり、ラベル（メールの仕分け札）で整理したりできます。届いたメールの自動仕分けなどに使えます。<br><span style="font-size:12.5px;color:#5c6880">※ API自体は無料。Google Cloudの管理画面でAPIを有効化し、認証情報を発行して使います。人のメールデータを扱うアプリを一般公開する場合は審査が必要になることがあります。</span></td><td><a href="https://developers.google.com/workspace/gmail/api/guides" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>Together AI API</td><td>オープンソースのAIモデル（無料公開されているAIの頭脳）をインターネット経由で呼び出して、文章生成や画像生成などに使えるサービスです。ChatGPTのAPIと同じ形式で使えるので、乗り換えや併用がしやすいです。<br><span style="font-size:12.5px;color:#5c6880">※ 無料でアカウント登録すると管理画面からAPIキーを発行できます。利用量に応じた従量課金制（使った分だけ支払い）です。</span></td><td><a href="https://docs.together.ai/intro" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>DeepInfra API</td><td>さまざまなAIモデルを低価格で呼び出せるサービスです。文章生成のほか、画像生成や音声の文字起こし（録音をテキストに変換）などもAPI（プログラムからの呼び出し口）で使えます。<br><span style="font-size:12.5px;color:#5c6880">※ 無料登録後に管理画面からAPIキーを発行できる従量課金制（使った分だけ支払い）です。GitHubやGoogleアカウントでログインできます。</span></td><td><a href="https://docs.deepinfra.com/" target="_blank" rel="noopener">公式ページ</a></td></tr>
+            <tr><td>Cloudflare API</td><td>Webサイトの高速化・セキュリティサービスであるCloudflareの各種設定（ドメイン管理、キャッシュ削除、ファイル保管など）を、画面を開かずにプログラムから操作できます。<br><span style="font-size:12.5px;color:#5c6880">※ 無料プランでも利用可能で、ダッシュボード（管理画面）の「My Profile &gt; API Tokens」からAPIトークンを発行して使います。</span></td><td><a href="https://developers.cloudflare.com/fundamentals/api/" target="_blank" rel="noopener">公式ページ</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note">※ 2026年8月時点の情報です。料金プランや提供条件は変わることがあるので、利用前に各公式ページで確認してください。</div>
+    </div>
+  </section>
+
+  <!-- ============ SETTING 10 ============ -->
+  <section class="sec" id="s10">
+    <p class="sec-label rv">SETTING 10</p>
+    <h2 class="sec-title rv">リモートコントロール</h2>
+    <p class="sec-lead rv">スマホから、自宅のPCのClaude Codeを操作できるようにします。</p>
+
+    <div class="card rv">
+      <h3>設定（3ステップ）</h3>
+      <div class="step">
+        <div class="step-no">1</div>
+        <div class="step-body">
+          <h4>スマホにClaudeのアプリを入れる</h4>
+          <p>App Store / Google Playの公式アプリです。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-no">2</div>
+        <div class="step-body">
+          <h4>PC側のClaude Codeでリモートコントロールを起動する</h4>
+          <p>起動するとQRコードが出てきます。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-no">3</div>
+        <div class="step-body">
+          <h4>QRコードをスマホで読み込んだら接続完了</h4>
+          <p>これで外にいながら、スマホでClaude Codeに指示が出せます。一度つなげばPC側を閉じるまで接続が続くので、作業の途中で外出してもスマホでそのまま続きができます。</p>
+        </div>
+      </div>
+
+      <p>僕は移動中に「今日のYouTube撮影の台本送ってくれない？」とスマホから送ったりしています。家に着く頃には仕事が終わっている——外出先で成果物を確認して、そのまま納品まで終わることもできてしまいます。</p>
+
+      <div class="prompt">
+        <div class="prompt-head">
+          <b>スマホから送る指示の実例</b>
+          <button class="copy" type="button">コピー</button>
+        </div>
+        <pre>（作業名）の続きを進めておいてください。
+終わったら、成果物をこのチャットに送ってください。</pre>
+      </div>
+
+      <div class="note warn"><b>注意：</b>この仕組みは自分のパソコンで動いています。PCの電源が切れていたら動きません。スリープでも動きません。僕はサブのMacを1台、電源つけっぱなしで家に置いています。電気代は月100円〜200円ほどなので、人件費としては優秀すぎます。</div>
+
+      <h3>10個の設定 まとめチェックリスト</h3>
+      <ul class="check">
+        <li>公式サイトからデスクトップアプリを入れて、作業フォルダを選んだ</li>
+        <li>情報を学習させない設定と位置情報をチェックした</li>
+        <li>許可モードを理解した（まず許可確認 → 慣れたら自動権限）</li>
+        <li>フォルダ構築プロンプトで、AIの作業場所を作った</li>
+        <li>CLAUDE.mdに最初の3ルールを書いた</li>
+        <li>よくやる作業を1つ、スキル化した</li>
+        <li>コネクタでツールを1つつないだ（Gmailがおすすめ）</li>
+        <li>カスタムMCPに挑戦した（Discordが実例つきでやりやすい）</li>
+        <li>APIを1つつないで、キーは.envに保管した</li>
+        <li>スマホからリモートコントロールで指示を出してみた</li>
+      </ul>
+
+      <h3>最後に、覚えて帰ってほしいこと</h3>
+      <ol class="takeaway">
+        <li><b>最初から全部やらなくて大丈夫</b><span>まず70点で作って、使いながら足りないところを足していくほうが早いです。</span></li>
+        <li><b>どの設定も、やること自体は日本語で頼むだけ</b><span>10個すべて、Claude Codeへの日本語の指示で完結します。</span></li>
+        <li><b>分からなくなったら、Claude Codeに聞く</b><span>Claude CodeのことはClaude Codeに聞くのが一番早いです。</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ [C:締めCTA] ============ -->
+  <section class="closing rv">
+    <div class="closing-inner">
+      <h2>設定が終わったら、次の一歩へ</h2>
+      <p>この資料の10個で、あなたのClaude Codeはプロと同じ土台になりました。さらに深く学びたい方へ、公式LINEから参加できる「AI×SNS攻略 月額0円コミュニティ」（LINEオープンチャット）をご用意しています。追加12大特典に加えて、最新のAI×マーケティング情報を僕がキャッチアップして配信しています。</p>
+      <p>コミュニティでは、累計3,000名以上が参加した『AI駆動型コンテンツビジネス 0→100完全攻略セミナー』にも完全無料でご招待しています。参加で豪華20大特典がもらえてしまうので、ぜひこちらもご活用ください。</p>
+
+      <div class="bonus">
+        <div><b>10大特典</b><span>公式LINE（受け取り済み）</span></div>
+        <div><b>追加12大特典</b><span>AI×SNS攻略 月額0円コミュニティ</span></div>
+        <div><b>20大特典</b><span>0→100完全攻略セミナー</span></div>
+      </div>
+
+      <a class="btn" href="https://utage-system.com/line/open/ttS3H5oAa7lk?mtid=gb3g3fVXON1c" target="_blank" rel="noopener">月額0円コミュニティの案内を受け取る</a>
+      <p style="margin-top:14px;font-size:13px;opacity:.8">※ オープンチャットへの参加案内は、公式LINEのトークに届きます。</p>
+    </div>
+  </section>
+
+  <p class="foot">星川ユウヤ</p>
+</div>
+
+<button class="totop" id="totop" type="button" aria-label="ページ上部へ戻る">↑</button>
+
+
+<script>
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* [C:進捗バー] + [C:トップへ戻る] */
+  var bar = document.getElementById('bar');
+  var totop = document.getElementById('totop');
+  function onScroll(){
+    var h = document.documentElement;
+    var max = h.scrollHeight - h.clientHeight;
+    var p = max > 0 ? (h.scrollTop / max) * 100 : 0;
+    if (bar) bar.style.width = p + '%';
+    if (totop) totop.classList.toggle('show', h.scrollTop > 640);
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+  if (totop) totop.addEventListener('click', function(){
+    window.scrollTo({top:0, behavior: reduce ? 'auto' : 'smooth'});
+  });
+
+  /* [C:出現アニメーション] 画面に入ったらふわっと表示 */
+  var rv = document.querySelectorAll('.rv');
+  if ('IntersectionObserver' in window && !reduce){
+    var io = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, {rootMargin:'0px 0px -12% 0px', threshold:0.08});
+    rv.forEach(function(el){ io.observe(el); });
+  } else {
+    rv.forEach(function(el){ el.classList.add('in'); });
+  }
+
+  /* [C:目次] + [C:サイド進捗ナビ] 現在地ハイライト */
+  var secs = Array.prototype.slice.call(document.querySelectorAll('section.sec[id]'));
+  var tocLinks = Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll('.sidenav a'));
+  if (secs.length && 'IntersectionObserver' in window){
+    var spy = new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if(!e.isIntersecting) return;
+        var id = '#' + e.target.id;
+        tocLinks.forEach(function(a){ a.classList.toggle('active', a.getAttribute('href') === id); });
+        navLinks.forEach(function(a){ a.classList.toggle('active', a.getAttribute('href') === id); });
+      });
+    }, {rootMargin:'-45% 0px -45% 0px'});
+    secs.forEach(function(s){ spy.observe(s); });
+  }
+
+  /* [C:プロンプト枠] コピーボタン */
+  document.querySelectorAll('.prompt .copy').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var pre = btn.closest('.prompt').querySelector('pre');
+      if(!pre) return;
+      var text = pre.innerText;
+      var done = function(){
+        var old = btn.textContent;
+        btn.textContent = 'コピーしました';
+        btn.classList.add('done');
+        setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1600);
+      };
+      if (navigator.clipboard && window.isSecureContext){
+        navigator.clipboard.writeText(text).then(done, fallback);
+      } else { fallback(); }
+      function fallback(){
+        var ta = document.createElement('textarea');
+        ta.value = text; ta.setAttribute('readonly','');
+        ta.style.position='fixed'; ta.style.opacity='0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); done(); } catch(e){}
+        document.body.removeChild(ta);
+      }
+    });
+  });
+
+  if (reduce) return;
+
+  /* [C:ヒーロー] マウス追従の光。触っていない時は中央 */
+  var hero = document.getElementById('hero');
+  var glow = document.getElementById('glow');
+  if (hero && glow){
+    hero.addEventListener('pointermove', function(ev){
+      var r = hero.getBoundingClientRect();
+      glow.style.setProperty('--mx', ((ev.clientX - r.left) / r.width * 100) + '%');
+      glow.style.setProperty('--my', ((ev.clientY - r.top) / r.height * 100) + '%');
+    });
+  }
+
+  /* [C:3Dホバーカード] 指で触る端末では無効（横スクロールを出さないため） */
+  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches){
+    document.querySelectorAll('.tilt').forEach(function(el){
+      el.addEventListener('pointermove', function(ev){
+        var r = el.getBoundingClientRect();
+        var rx = ((ev.clientY - r.top) / r.height - .5) * -5;
+        var ry = ((ev.clientX - r.left) / r.width - .5) * 5;
+        el.style.transform = 'perspective(760px) rotateX(' + rx + 'deg) rotateY(' + ry + 'deg) translateY(-3px)';
+      });
+      el.addEventListener('pointerleave', function(){ el.style.transform = ''; });
+    });
+  }
+})();
+</script>
+</body>
+</html>
