@@ -947,6 +947,10 @@ tbody tr:last-child td{border-bottom:0}
     rv.forEach(function(el){ el.classList.add('in'); });
   }
 
+  /* 最後の砦: 何かの理由で発火しなかった .rv を読み込み2.5秒後に強制表示する。
+     アニメを諦めるより、章が丸ごと消えるほうが事故（2026-08-20 No.12 / 2026-09-25 No.9・No.11） */
+  setTimeout(function(){ rv.forEach(function(el){ el.classList.add('in'); }); }, 2500);
+
   /* [C:目次] + [C:サイド進捗ナビ] 現在地ハイライト */
   var secs = Array.prototype.slice.call(document.querySelectorAll('section.sec[id]'));
   var tocLinks = Array.prototype.slice.call(document.querySelectorAll('.toc a'));
