@@ -941,8 +941,8 @@ tbody tr:last-child td{border-bottom:0}
   if ('IntersectionObserver' in window && !reduce){
     var io = new IntersectionObserver(function(es){
       es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
-    }, {rootMargin:'0px 0px -12% 0px', threshold:0.08});
-    rv.forEach(function(el){ io.observe(el); });
+    }, {rootMargin:'0px 0px -12% 0px', threshold:0});  /* threshold>0だと、画面の十数倍の高さの要素（長文プロンプトのカード等）が一生発火せず章ごと消える（2026-08-20 No.12 / 2026-09-25 No.9・No.11で実発生） */
+    rv.forEach(function(el){ if (el.offsetHeight > window.innerHeight) { el.classList.add('in'); } else { io.observe(el); } });  /* 画面より高い要素はアニメさせない。動いて見えないうえ、発火条件に届かず消える事故の元 */
   } else {
     rv.forEach(function(el){ el.classList.add('in'); });
   }
