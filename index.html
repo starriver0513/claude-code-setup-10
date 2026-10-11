@@ -114,7 +114,7 @@ img{max-width:100%;height:auto;display:block}
 /* ============ [C:目次] ============ */
 .toc{margin:30px 0 0;padding:24px 26px;border-radius:var(--radius);background:var(--white);border:1px solid var(--line);box-shadow:var(--shadow)}
 .toc h2{margin:0 0 14px;font-family:'M PLUS 1',sans-serif;font-size:17px;color:var(--navy)}
-.toc ol{margin:0;padding-left:0;list-style:none;counter-reset:toc;display:grid;gap:6px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.toc ol{margin:0;padding-left:0;list-style:none;counter-reset:toc;display:grid;gap:6px;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr))}
 .toc li{counter-increment:toc}
 .toc a{display:flex;gap:10px;align-items:baseline;padding:8px 10px;border-radius:10px;color:var(--ink-soft)!important;
   font-weight:700;font-size:14.5px;text-decoration:none;transition:background .2s ease,color .2s ease}
@@ -186,8 +186,8 @@ img{max-width:100%;height:auto;display:block}
   box-shadow:0 16px 38px rgba(4,20,54,.32);overflow:hidden}
 .prompt-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 16px;
   background:rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.09)}
-.prompt-head b{color:#cfe4ff;font-size:12.5px;font-weight:800;letter-spacing:.04em}
-.copy{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border:0;border-radius:9px;cursor:pointer;
+.prompt-head b{color:#cfe4ff;font-size:12.5px;font-weight:800;letter-spacing:.04em;min-width:0}
+.copy{flex-shrink:0;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border:0;border-radius:9px;cursor:pointer;
   background:var(--blue);color:#fff;font-size:12px;font-weight:800;font-family:inherit;transition:background .2s ease,transform .2s ease}
 .copy:hover{transform:translateY(-1px)}
 .copy.done{background:var(--ok)}
